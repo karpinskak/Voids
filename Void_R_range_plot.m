@@ -5,22 +5,179 @@ delete(gcp('nocreate'))
 
 DIR='/home/pracownicy/karpinska/Dokumenty/Praca_doktorska_analizy/Cloud_voids/';
 
-%% Load constants and functions
+% Load constants and functions
 addpath(DIR)
 Const=Constants;
 fDIR=[DIR 'Functions/'];
 addpath(fDIR)
+nazwar1='R1_void_minimum';
+nazwar2='R2_void_maximum';
 
 %% Data
+npool=14;
+teta=[pi/16,pi/8,pi/4];
 delta=[0.1:0.005:1.005]*10^(-2);
-A=0.00001:2*10^(-5):0.03001;
+A=0.0001:2 *10^(-4):0.03001;
+%delta=[0.1:0.1:1.005]*10^(-2);
+%A=0.0001:(2*10^(-3)):0.03001;
+[Delta,AA]=meshgrid(delta,A);
 
-%% Calulations
+% plot parameters
+skala=100;
+fsize=16;
+width=16;
+height=30;
 
-% R1
+% Declarations
+R=zeros(numel(delta),numel(A));
+R_1=cell(numel(teta),1);
+R_2=cell(numel(teta),1);
+syms P(tau_p) Amax(tau_p)
+assume(tau_p,{'real','positive'})
 
-%R2 - A<A_cr
+% Calculations
+%% R1
+if isfile([DIR nazwar1, '.mat'])
+    load([DIR nazwar1,'.mat'])
+else
+    parpool('local',npool)
+    tic
+    for l=1:numel(teta)
+        teta_temp=teta(l);
+        
+        R1=zeros(numel(delta),numel(A));
+        tau_p1=zeros(size(R1));
+        for j=1:numel(delta)
+            delta_temp=delta(j);
+            R1_slice=zeros(1,numel(A));
+            tau_p1_slice=zeros(size(R1_slice));
+            syms tau_p
+            assume(tau_p,{'real','positive'})
+            P=@(tau_p) 1+Const.nu^(-1)*Const.g^2*tau_p.^3.*(sin(teta_temp)).^2-Const.nu*tau_p.*delta_temp.^(-2);
+            Amax=@(tau_p) (0.5*(4*pi)^(-2)*P(tau_p).*((1+4*Const.nu*tau_p./(P(tau_p).^2.*delta_temp.^2)).^(1/2)-1)).^(1/2);
+            parfor k=1:numel(A)
+                A_temp=A(k);
+                tau_p_sol=double(vpasolve(Amax(tau_p)-A_temp==0,tau_p));
+                R_sol=10^6*sqrt(9*Const.ro_a*Const.nu*tau_p_sol/(2*Const.ro_p));
+                if isempty(tau_p_sol)==1 || imag(R_sol)~=0
+                    R_sol=NaN;
+                else
+                end
+                R1_slice(k)=real(R_sol);
+            end
+            R1(j,:)=R1_slice;
+            disp([num2str(l),', ',num2str(j)])
+        end
+        R_1{l}=R1';
+    end
+    save([DIR nazwar1,'.mat'],'teta', 'delta', 'A', 'R_1', 'DIR')
+    toc
+end
 
+
+%% R2 - A<A_cr
+% finding Svmax first for given A in the range Svs Svi, then calculating R out of it.
 %R2 - A>A_cr
+% equillibrium curve value for rs and given A gives Sv, then calc R
 
-% Plot
+if isfile([DIR nazwar2 '.mat'])
+    load([DIR nazwar2,'.mat'])
+else
+    syms r
+    assume(r,{'positive','real'})
+    Sv_max=zeros(numel(A),1);
+    for k=1:numel(A)
+        A_temp=A(k);
+        f_A=@(r) eq_curve(r,A_temp);
+        if A_temp<Const.Acr
+            df=diff(f_A,r);
+            crit=double(vpasolve(df==0,r,[Const.rs,Const.ri]));
+            max_id=find((crit<Const.ri).*(crit>Const.rs));
+            if isempty(max_id)==0
+                Svm=eq_curve(crit(max_id),A_temp);
+            else
+                error(['Rmax poza zakresem dla ',num2str(k)])
+            end
+        else
+            Svm=eq_curve(Const.rs,A_temp);
+        end
+        Sv_max(k)=Svm;
+    end
+    SV_max=repmat(Sv_max,1,numel(delta));
+    
+    delete(gcp('nocreate'))
+    
+    for l=1:numel(teta)
+        tau_p=Const.nu*(Const.g*AA.*Delta*sin(teta(l))).^(-1).*SV_max;
+        R2=10^6*sqrt(9*Const.ro_a*Const.nu*tau_p/(2*Const.ro_p));
+        R1=R_1{l};
+        R2(isnan(R1))=NaN;
+        R_2{l}=R2;
+    end
+end
+save([nazwar2,'.mat'],'teta', 'delta', 'A', 'R_2', 'DIR')
+
+%% Plot
+figure(1)
+set(gcf,'Position', [640, 300, 2*560, 2*420 ],...
+    'paperunits','centimeters',...
+    'Color',[1 1 1],...
+    'papersize',[width,height],...
+    'InvertHardCopy','off')
+box on
+if size(R_2{1})~=size(Delta)
+   for j=1:numel(teta)
+       R_2{j}=R_2{j}';
+   end
+end
+tiledlayout(numel(teta),3)
+h(1)=nexttile;
+hp(1)=pcolor(Delta*skala,AA,R_1{1});
+ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+grid off
+h(2)=nexttile;
+hp(2)=pcolor(Delta*skala,AA,R_2{1});
+grid off
+h(3)=nexttile;
+hp(3)=pcolor(Delta*skala,AA,R_2{1}-R_1{1});
+grid off
+
+h(4)=nexttile;
+hp(4)=pcolor(Delta*skala,AA,R_1{2});
+ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+grid off
+h(5)=nexttile;
+hp(5)=pcolor(Delta*skala,AA,R_2{2});
+grid off
+h(6)=nexttile;
+hp(6)=pcolor(Delta*skala,AA,R_2{2}-R_1{2});
+grid off
+h(7)=nexttile;
+hp(7)=pcolor(Delta*skala,AA,R_1{3});
+ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
+grid off
+h(8)=nexttile;
+hp(8)=pcolor(Delta*skala,AA,R_2{3});
+xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
+grid off
+h(9)=nexttile;
+hp(9)=pcolor(Delta*skala,AA,R_2{3}-R_1{3});
+xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
+grid off
+
+annotation('textbox',[1 0.5 0.3 0.2],'String','$\theta=0$')
+%annotation('textbox',[],'$\theta=\frac{pi}{4}$','FontSize',fsize+2,'interpreter','latex')
+%annotation('textbox',[],'\theta=\frac{pi}{2}$','FontSize',fsize+2,'interpreter','latex')
+set(h,'FontSize',fsize)
+box on
+set(hp,'EdgeColor','none')
+set(h,'colormap',jet,'clim',[0 60])
+cbh=colorbar(h(6));
+title(cbh,'$R$~$[\mu m]$','FontSize',fsize+2,'interpreter','latex')
+
+function krzywa=eq_curve(r,A)
+
+chi=(1-exp(-r.^2/2))./(2*pi*A.*r.^2);
+krzywa=A.*r.*sqrt(1+chi.^2);
+end
