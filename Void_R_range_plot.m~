@@ -134,37 +134,38 @@ tiledlayout(numel(teta),3)
 h(1)=nexttile;
 hp(1)=pcolor(Delta*skala,AA,R_1{1});
 ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
-grid off
-h(2)=nexttile;
-hp(2)=pcolor(Delta*skala,AA,R_2{1});
-grid off
-h(3)=nexttile;
-hp(3)=pcolor(Delta*skala,AA,R_2{1}-R_1{1});
-grid off
 
-h(4)=nexttile;
+h(3)=nexttile;
 hp(4)=pcolor(Delta*skala,AA,R_1{2});
 ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
-grid off
+
 h(5)=nexttile;
-hp(5)=pcolor(Delta*skala,AA,R_2{2});
-grid off
-h(6)=nexttile;
-hp(6)=pcolor(Delta*skala,AA,R_2{2}-R_1{2});
-grid off
-h(7)=nexttile;
 hp(7)=pcolor(Delta*skala,AA,R_1{3});
 ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
 xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
-grid off
-h(8)=nexttile;
+
+h(2)=nexttile;
+hp(2)=pcolor(Delta*skala,AA,R_2{1});
+
+h(4)=nexttile;
+hp(5)=pcolor(Delta*skala,AA,R_2{2});
+
+h(6)=nexttile;
 hp(8)=pcolor(Delta*skala,AA,R_2{3});
 xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
-grid off
-h(9)=nexttile;
+
+
+d(2)=nexttile;
+hp(6)=pcolor(Delta*skala,AA,R_2{2}-R_1{2});
+
+
+
+
+
+d(3)=nexttile;
 hp(9)=pcolor(Delta*skala,AA,R_2{3}-R_1{3});
 xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
-grid off
+
 
 annotation('textbox',[1 0.5 0.3 0.2],'String','$\theta=0$')
 %annotation('textbox',[],'$\theta=\frac{pi}{4}$','FontSize',fsize+2,'interpreter','latex')
@@ -172,8 +173,10 @@ annotation('textbox',[1 0.5 0.3 0.2],'String','$\theta=0$')
 set(h,'FontSize',fsize)
 box on
 set(hp,'EdgeColor','none')
-set(h,'colormap',jet,'clim',[0 60])
-cbh=colorbar(h(6));
+set(h,'colormap',jet,'clim',[0 150])
+cbh=colorbar(h(5));
+set(d,'colormap',othercolor('BuDRd_12'))
+cbd=colorbar(d(2));
 title(cbh,'$R$~$[\mu m]$','FontSize',fsize+2,'interpreter','latex')
 
 function krzywa=eq_curve(r,A)

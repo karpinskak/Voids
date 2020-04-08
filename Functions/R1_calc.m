@@ -1,11 +1,3 @@
-
-Const=Constants;
-teta=pi/16;
-delta=0.0011:0.00005:0.0015;
-A=[0.0011,0.0123,0.0125,0.0127,0.0129];
-
-[R_1] =R1_calc(Const,teta,A,delta);
- 
 function [R_1] =R1_calc(Const,teta,A,delta)
 
 for l=1:numel(teta)
@@ -20,7 +12,13 @@ for l=1:numel(teta)
         Amax=@(tau_p) (0.5*(4*pi)^(-2)*P(tau_p).*((1+4*Const.nu*tau_p./(P(tau_p).^2.*delta_temp.^2)).^(1/2)-1)).^(1/2);
         for k=1:numel(A)
             A_temp=A(k);
-            tau_p_sol=double(vpasolve(Amax(tau_p)-A_temp==0,tau_p,[0,Inf]));
+            tau_p_sola1=double(vpasolve(Amax(tau_p)-A_temp==0,tau_p,5));
+            tau_p_sola2=double(vpasolve(Amax(tau_p)-A_temp==0,tau_p,10^(-6)));
+            tau_p_sol=min(tau_p_sola1(tau_p_sola1>0),tau_p_sola2(tau_p_sola2>0));
+           if isempty(tau_p_sol)==1 || tau_p_sol>2*Const.ro_p*(25*(10^(-6)).^2/(9*Const.nu*Const.ro_a))
+               
+               tau_p_sol=double(vpasolve(Amax(tau_p)-A_temp==0,tau_p,10^(-10)));
+           end
             R_sol=10^6*sqrt(9*Const.ro_a*Const.nu*tau_p_sol/(2*Const.ro_p));
             if isempty(tau_p_sol)==1 || imag(R_sol)~=0
                 R_sol=NaN;
@@ -32,5 +30,7 @@ for l=1:numel(teta)
         disp([num2str(l),', ',num2str(j)])
     end
     R_1{l}=R1';
+    toc
 end
+
 end
