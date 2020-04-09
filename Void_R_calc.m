@@ -10,9 +10,9 @@ addpath(DIR)
 Const=Constants;
 fDIR=[DIR 'Functions/'];
 addpath(fDIR)
-nazwar1='R1_void_minimum';
-nazwar2='R2_void_maximum';
-nazwar3='Rm_void_middle';
+nazwar1='R1_void';
+nazwar2='R2_void';
+nazwar3='Rs_void';
 
 %% Data
 npool=13;
@@ -41,32 +41,30 @@ else
     toc
 end
 
-%% Rm
-if isfile([DIR nazwar3, '.mat'])
-    load([DIR nazwar3,'.mat'])
+%% R2
+if isfile([DIR nazwar2, '.mat'])
+    load([DIR nazwar2,'.mat'])
 else
-    disp('Calculating Rm now.')5c
+    disp('Calculating R_s now.')
     parpool('local',npool)
     tic
-    [R_m] =Rm_calc(Const,teta,A,delta);
-    save([DIR nazwar3,'.mat'],'teta', 'delta', 'A', 'R_m', 'DIR')
+    [R_2] =R2_calc(Const,teta,A,delta);
+    save([DIR nazwar2,'.mat'],'teta', 'delta', 'A', 'R_m', 'DIR')
     toc
 end
 
 
 
-%% R2 - A<A_cr
-% finding Svmax first for given A in the range Svs Svi, then calculating R out of it.
-%R2 - A>A_cr
-% equillibrium curve value for rs and given A gives Sv, then calc R
+%% Rs
+%  equillibrium curve value for rs and given A gives Sv, then calc R
 
-if isfile([DIR nazwar2 '.mat'])
-    load([DIR nazwar2,'.mat'])
+if isfile([DIR nazwar3 '.mat'])
+    load([DIR nazwar3,'.mat'])
 else
-    [R_2] = R2_calc(Const,teta,A,delta,R_1,AA,Delta);
+    [R_s] = Rs_calc(Const,teta,A,delta,R_1,AA,Delta);
 end
 delete(gcp('nocreate'))
-save([nazwar2,'.mat'],'teta', 'delta', 'A', 'R_2', 'DIR')
+save([nazwar3,'.mat'],'teta', 'delta', 'A', 'R_2', 'DIR')
 
 %% Plot
 

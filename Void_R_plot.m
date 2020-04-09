@@ -1,0 +1,91 @@
+% Load constants and functions
+addpath(DIR)
+Const=Constants;
+fDIR=[DIR 'Functions'];
+addpath(fDIR)
+
+% plot parameters
+skala=100;
+fsize=16;
+width=16;
+height=30;
+
+figure(1)
+set(gcf,'Position', [640, 300, 2*560, 2*420 ],...
+    'paperunits','centimeters',...
+    'Color',[1 1 1],...
+    'papersize',[width,height],...
+    'InvertHardCopy','off')
+box on
+[Delta,AA]=meshgrid(delta,A);
+if size(R_2{1})~=size(Delta)
+   for j=1:numel(teta)
+       R_2{j}=R_2{j}';
+   end
+end
+
+tiledlayout(4,numel(teta))
+for j=1:numel(teta)
+h(j)=nexttile;
+hp(j)=pcolor(Delta*skala,AA,R_1{j});
+if mod(j,3)==1
+ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+end
+grid on
+title(['$\theta=\pi/$',num2str(floor(1/(teta(j)/pi)))],'FontSize',fsize+2,'interpreter','latex')
+end
+
+for j=1:numel(teta)
+h(j+numel(teta))=nexttile;
+hp(j+numel(teta))=pcolor(Delta*skala,AA,R_2{j});
+if mod(j,3)==1
+ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+end
+grid on
+end
+
+for j=1:numel(teta)
+h(j+2*numel(teta))=nexttile;
+hp(j+2*numel(teta))=pcolor(Delta*skala,AA,R_s{j});
+if mod(j,3)==1
+ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+end
+grid on
+end
+
+for j=1:numel(teta)
+d(j)=nexttile;
+hp(j+3*numel(teta))=pcolor(Delta*skala,AA,R_2{j}-R_s{j});
+if mod(j,3)==1
+ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+end
+grid on
+xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
+end
+
+set(h,'FontSize',fsize-2)
+set(d,'FontSize',fsize-2)
+set(hp,'EdgeColor','none')
+
+set(h,'colormap',jet,'clim',[0 50])
+cbh=colorbar(h(3));
+cbh.Label.String='$R_1$~$[\mu m]$';
+cbh.Label.Interpreter='latex';
+cbh.Label.FontSize=fsize;
+%title(cbh,,'FontSize',fsize,'interpreter','latex')
+
+cbh=colorbar(h(6));
+cbh.Label.String='$R_2$~$[\mu m]$';
+cbh.Label.Interpreter='latex';
+cbh.Label.FontSize=fsize;
+
+cbh=colorbar(h(9));
+cbh.Label.String='$R_s$~$[\mu m]$';
+cbh.Label.Interpreter='latex';
+cbh.Label.FontSize=fsize;
+
+set(d,'colormap',othercolor('RdYlBu5'))%,'clim',[-30 30])
+cbd=colorbar(d(3));
+cbd.Label.String='$R_2-R_s$~$[\mu m]$';
+cbd.Label.Interpreter='latex';
+cbd.Label.FontSize=fsize;
