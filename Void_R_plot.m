@@ -66,6 +66,10 @@ end
 set(h,'FontSize',fsize-2)
 set(d,'FontSize',fsize-2)
 set(hp,'EdgeColor','none')
+set(h,'yscale','log')
+set(h,'xscale','log')
+set(d,'yscale','log')
+set(d,'xscale','log')
 
 set(h,'colormap',jet,'clim',[0 50])
 cbh=colorbar(h(3));
@@ -84,7 +88,7 @@ cbh.Label.String='$R_s$~$[\mu m]$';
 cbh.Label.Interpreter='latex';
 cbh.Label.FontSize=fsize;
 
-set(d,'colormap',othercolor('RdYlBu5'))%,'clim',[-30 30])
+set(d,'colormap',othercolor('RdYlBu5'),'clim',[-30 20])
 cbd=colorbar(d(3));
 cbd.Label.String='$R_2-R_s$~$[\mu m]$';
 cbd.Label.Interpreter='latex';
