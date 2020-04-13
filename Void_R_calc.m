@@ -45,11 +45,11 @@ end
 if isfile([DIR nazwar2, '.mat'])
     load([DIR nazwar2,'.mat'])
 else
-    disp('Calculating R_s now.')
+    disp('Calculating R_2 now.')
     parpool('local',npool)
     tic
     [R_2] =R2_calc(Const,teta,A,delta);
-    save([DIR nazwar2,'.mat'],'teta', 'delta', 'A', 'R_m', 'DIR')
+    save([DIR nazwar2,'.mat'],'teta', 'delta', 'A', 'R_2', 'DIR')
     toc
 end
 
@@ -64,7 +64,7 @@ else
     [R_s] = Rs_calc(Const,teta,A,delta,R_1,AA,Delta);
 end
 delete(gcp('nocreate'))
-save([nazwar3,'.mat'],'teta', 'delta', 'A', 'R_2', 'DIR')
+save([nazwar3,'.mat'],'teta', 'delta', 'A', 'R_s', 'DIR')
 
 %% Plot
 

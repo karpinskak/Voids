@@ -11,7 +11,7 @@ Const=Constants;
 fDIR=[DIR 'Functions/'];
 addpath(fDIR)
 nazwar1='R1_void';
-nazwar2='R2_void_x';
+nazwar2='R2_void';
 nazwar3='Rs_void';
 
 % plot parameters
@@ -74,14 +74,14 @@ end
 for j=1:numel(teta)
 d(j)=nexttile;
 interv=R_r{j}-R_l{j};
-interv(interv<0)=NaN;
+interv(interv<=0)=NaN;
+deltaR{j}=interv;
 hp(j+2*numel(teta))=pcolor(Delta*skala,AA,interv);
 if mod(j,numel(teta))==1
 ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
 end
 grid on
 xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
-
 end
 
 set(h,'FontSize',fsize-2)
@@ -92,20 +92,26 @@ set(h,'xscale','log')
 set(d,'yscale','log')
 set(d,'xscale','log')
 box on
-
-set(h,'colormap',jet,'clim',[0 50])
+for j=1:numel(h)
+shading(h(j),'interp')
+end
+for j=1:numel(d)
+shading(d(j),'interp')
+end
+set(h(1:3),'colormap',winter,'clim',[0 max(max(R_l{1}))])
 cbh=colorbar(h(numel(teta)));
 cbh.Label.String='$R_<$~$[\mu m]$';
 cbh.Label.Interpreter='latex';
 cbh.Label.FontSize=fsize;
 
+set(h(4:6),'colormap',autumn)%,'clim',[0 150])
 cbh=colorbar(h(2*numel(teta)));
 cbh.Label.String='$R_>$~$[\mu m]$';
 cbh.Label.Interpreter='latex';
 cbh.Label.FontSize=fsize;
 
 
-set(d,'colormap',jet,'clim',[0 50])
+set(d,'colormap',autumn)%,'clim',[0 150])
 cbd=colorbar(d(numel(teta)));
 cbd.Label.String='$\Delta R$~$[\mu m]$';
 cbd.Label.Interpreter='latex';

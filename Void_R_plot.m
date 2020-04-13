@@ -71,7 +71,13 @@ set(h,'xscale','log')
 set(d,'yscale','log')
 set(d,'xscale','log')
 
-set(h,'colormap',jet,'clim',[0 50])
+for j=1:numel(h)
+shading(h(j),'interp')
+end
+for j=1:numel(d)
+shading(d(j),'interp')
+end
+set(h,'colormap',jet,'clim',[0 200])
 cbh=colorbar(h(3));
 cbh.Label.String='$R_1$~$[\mu m]$';
 cbh.Label.Interpreter='latex';
@@ -88,8 +94,9 @@ cbh.Label.String='$R_s$~$[\mu m]$';
 cbh.Label.Interpreter='latex';
 cbh.Label.FontSize=fsize;
 
-set(d,'colormap',othercolor('RdYlBu5'),'clim',[-30 20])
+set(d,'colormap',othercolor('RdYlBu5'))%,'clim',[-30 20])
 cbd=colorbar(d(3));
 cbd.Label.String='$R_2-R_s$~$[\mu m]$';
 cbd.Label.Interpreter='latex';
 cbd.Label.FontSize=fsize;
+

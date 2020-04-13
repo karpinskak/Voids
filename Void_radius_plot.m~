@@ -24,6 +24,7 @@ kolory2=[[0.5;0.5;1],[1;0.5;0.5],[0.5;1;0.5]];
 %% Input data and calculate param=St/A;
 
 npool=2;
+nazwa='orbit_radii_data';
 %delta=[0.1:0.005:1.005]*10^(-2);
 %A=0.0001:2*10^(-4):0.03001;
 delta=[0.1:0.08:1]*10^(-2);
@@ -31,25 +32,30 @@ A=0.0001:(2*10^(-4)):0.002;
 R=[3,13,23]*10^(-6);
 [Delta,AA]=meshgrid(delta,A);
 skala=100;
-ST=zeros(size(AA));
 
-for j=numel(R)
+
+ST=zeros(size(AA));
+if isfile([DIR nazwa '.mat'])==1
+    load([DIR nazwa])
+else
+    parpool('local',npool)
+for j=1:numel(R)
     for k=1:size(AA,1)
         for l=1:size(AA,2)
-            [par]=wylicz_param(Const,2,R(j),delta(l),0,A(k),0,0);
+            [par]=wylicz_param(Const,2,R(j),Delta(k,l),0,AA(k,l),0,0);
             ST(k,l)=par.St;
         end
     end
+    STT{j}=ST;
     clear par
     param=ST./AA;
-    parpool('local',npool)
     r0=zeros(size(AA));
     for k=1:size(param,1)
         r0_temp=zeros(1,size(param,2))';
         parfor l=1:size(param,2)
             ptemp=param(k,l);
             if ptemp>Const.St_A_cr
-                r0_temp(l)=Row_orb_bur(ptemp);
+                r0_temp(l)=Row_orb_bur(1/ptemp);
             else
                 r0_temp(l)=NaN;
             end
@@ -59,7 +65,8 @@ for j=numel(R)
     orbit_radii{j}=r0;
 end
 delete(gcp('nocreate'))
-save('orbit_radii_data','orbit_radii',param,ST,AA,
+save([DIR, nazwa],'STT','AA','A','Delta','delta','R','orbit_radii')
+end
 tau_p=2*R.^2*Const.ro_p/(9*Const.ro_a*Const.nu);
 
 %% plot
@@ -81,10 +88,10 @@ for p=1:numel(R)
     Rtemp(p)=R(j);
     Delta(r0temp==0)=NaN;
     AA(r0temp==0)=NaN; % rysowanie tylko tych przypadków, dla których istnieje orbita stacjonarna
-    C=r0temp*100;
+    C=r0temp*skala;
 
-    [C,h]=contour(Delta,AA,C,v1,'Color',kolory(:,j),'ShowText','off','Linewidth',3,'LineStyle','-');
-    clabel(C,h,'FontSize',13,'FontName','Helvetica')
+    [Cx,h]=contour(Delta,AA,C,v1,'Color',kolory(:,j),'ShowText','off','Linewidth',3,'LineStyle','-');
+    clabel(Cx,h,'FontSize',13,'FontName','Helvetica')
     hold on
 end
 
