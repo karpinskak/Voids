@@ -3,7 +3,7 @@ close all
 clc
 delete(gcp('nocreate'))
 
-DIR='/home/pracownicy/karpinska/Dokumenty/Praca_doktorska_analizy/Cloud_voids_theoretically/';
+DIR='/home/pracownicy/karpinska/Dokumenty/Praca_doktorska_analizy/Cloud_voids/';
 
 % Load constants and functions
 addpath(DIR)
