@@ -3,7 +3,7 @@ close all
 clc
 delete(gcp('nocreate'))
 
-DIR='/home/pracownicy/karpinska/Dokumenty/Praca_doktorska_analizy/Cloud_voids/';
+DIR='/home/pracownicy/karpinska/Dokumenty/Praca_doktorska_analizy/Cloud_voids_theoretically/';
 
 % Load constants and functions
 addpath(DIR)
@@ -98,13 +98,13 @@ end
 for j=1:numel(d)
 shading(d(j),'interp')
 end
-set(h(1:3),'colormap',winter,'clim',[0 max(max(R_l{1}))])
+set(h(1:4),'colormap',winter,'clim',[0 max(max(R_l{1}))])
 cbh=colorbar(h(numel(teta)));
 cbh.Label.String='$R_<$~$[\mu m]$';
 cbh.Label.Interpreter='latex';
 cbh.Label.FontSize=fsize;
 
-set(h(4:6),'colormap',autumn)%,'clim',[0 150])
+set(h(5:8),'colormap',autumn)%,'clim',[0 150])
 cbh=colorbar(h(2*numel(teta)));
 cbh.Label.String='$R_>$~$[\mu m]$';
 cbh.Label.Interpreter='latex';

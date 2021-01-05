@@ -1,4 +1,4 @@
-function [R_s] = Rs_calc(Const,teta,A,delta,R_1,AA,Delta)
+function [R_s] = Rs_calc(Const,teta,A,delta,AA,Delta)
 %R2_CALC Summary of this function goes here
 %   Detailed explanation goes here
 

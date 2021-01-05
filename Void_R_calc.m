@@ -15,7 +15,7 @@ nazwar2='R2_void_1_teta';
 nazwar3='Rs_void_1_teta';
 
 %% Data
-npool=4;
+npool=3;
 teta=[3*pi/8];
 delta=(0.1:0.005:1.005)*10^(-2);
 A=0.0001:2*10^(-4):0.03001;
@@ -24,13 +24,13 @@ A=0.0001:2*10^(-4):0.03001;
 [Delta,AA]=meshgrid(delta,A);
 
 
-% Declarations
+%Declarations
 R=zeros(numel(delta),numel(A));
 R_1=cell(numel(teta),1);
 R_2=cell(numel(teta),1);
 
-% Calculations
-%% R1
+Calculations
+R1
 if isfile([DIR nazwar1, '.mat'])
     load([DIR nazwar1,'.mat'])
 else
@@ -41,12 +41,12 @@ else
     toc
 end
 
-%% R2
+% R2
 if isfile([DIR nazwar2, '.mat'])
     load([DIR nazwar2,'.mat'])
 else
     disp('Calculating R_2 now.')
-    parpool('local',npool)
+    %%parpool('local',npool)
     tic
     [R_2] =R2_calc(Const,teta,A,delta);
     save([DIR nazwar2,'.mat'],'teta', 'delta', 'A', 'R_2', 'DIR')
@@ -61,7 +61,7 @@ end
 if isfile([DIR nazwar3 '.mat'])
     load([DIR nazwar3,'.mat'])
 else
-    [R_s] = Rs_calc(Const,teta,A,delta,R_1,AA,Delta);
+    [R_s] = Rs_calc(Const,teta,A,delta,AA,Delta);
 end
 delete(gcp('nocreate'))
 save([nazwar3,'.mat'],'teta', 'delta', 'A', 'R_s', 'DIR')
