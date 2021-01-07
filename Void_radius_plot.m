@@ -3,13 +3,14 @@ close all
 clc
 delete(gcp('nocreate'))
 
-DIR='/home/pracownicy/karpinska/Dokumenty/Praca_doktorska_analizy/Cloud_voids/';
+DIR='/home/pracownicy/karpinska/Dokumenty/Praca_doktorska_analizy/Cloud_voids_theoretically/';
 
 % Load constants and functions
 addpath(DIR)
 Const=Constants;
 fDIR=[DIR 'Functions/'];
 addpath(fDIR)
+load([DIR,'Stare_przydatne/Data/Simulation_vortex_parameters.mat'],'vortex_param')
 
 % plot parameters
 skala=100;
@@ -20,6 +21,8 @@ v1=[0.5,2,5]; % wektor wartosci konturow
 linest={'-','--',':'};
 kolory=[[0;0.5;1],[1;0;0],[0.1;0.8;0]];%,[0;0;1],[1;230/255;0]];
 kolory2=[[0.5;0.5;1],[1;0.5;0.5],[0.5;1;0.5]];
+sim_points=1;
+point_size=30;
 
 %% Input data and calculate param=St/A;
 
@@ -100,7 +103,12 @@ end
 
 legend({'R=23um','','R=13um','','R=3um',''})%,'simulations'},'FontSize',19,'FontName','Helvetica')
 hold on
-
+if sim_points==1
+    lab=1:numel(vortex_param.delta);
+    labelki=cellstr(num2str(lab'));
+    scatter(vortex_param.delta*skala,vortex_param.A,point_size,'k','filled')
+    text(1.01*vortex_param.delta*skala,1.01*vortex_param.A,labelki',30)
+end
 %xlim([10^(-1) 10^(1)])
 %ylim([10^(-6) 10^(-2)])
 set(gca,'yscale','log')

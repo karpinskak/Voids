@@ -3,12 +3,17 @@ function [points, stability] = eq_points(A,Sv,St)
 %   'points' is nx2 matrix where n is the number of eq. points and 2 gives X
 %   and Y positions.
 %   'stability' can have values 1,2 which are stable and unstable
+% 20210106: 1) Part for A>Acr was wrong - "points" had just
+% radial component calculated, stability was assumed =1. I  just finished
+% the if clause earlier and applied the calculations of x,y point and it
+% stability as for the other case.
 
 syms r
 assume(r>=0)
+
 if A>=0.02176
-    points=vpasolve(r*sqrt(1+((1-exp(-r^2/2))/(2*pi*A*r^2))^2)-Sv/A==0,r);
-    stability=1;
+    point_r=vpasolve(r*sqrt(1+((1-exp(-r^2/2))/(2*pi*A*r^2))^2)-Sv/A==0,r);
+
 else
     rmax=200;
     r_bezw=[0:0.001:6,6.01:0.01:rmax];
@@ -31,27 +36,27 @@ else
     if numel(point_r)>3
         error(['Sth wrong with nr of eqillibrium points:' num2str(numel(points))])
     end
-
-points=zeros(numel(point_r),2);
-chi=(1-exp(-point_r.^2/2))./(2*pi*A*point_r.^2);
-points(:,1)=Sv*chi./(A*(1+chi.^2));
-points(:,2)=-Sv./(A*(1+chi.^2));
-stability=zeros(size(point_r));
-
-for j=1:numel(point_r)
-    fi_war=fi(point_r(j));
-    if fi_war<0
-        war=A/(St*abs(fi_war)); % 9.01.2019: There was a mistake here before with -1 at the end!
-    elseif fi_war>0
-        war=A/sqrt(fi_war);
-    end
-    if war>=1
-        stability(j)=1;
-    else
-        stability(j)=2;
-    end
 end
-end
+
+    points=zeros(numel(point_r),2);
+    chi=(1-exp(-point_r.^2/2))./(2*pi*A*point_r.^2);
+    points(:,1)=Sv*chi./(A*(1+chi.^2));
+    points(:,2)=-Sv./(A*(1+chi.^2));
+    stability=zeros(size(point_r));
+    
+    for j=1:numel(point_r)
+        fi_war=fi(point_r(j));
+        if fi_war<0
+            war=A/(St*abs(fi_war)); % 9.01.2019: There was a mistake here before with -1 at the end!
+        elseif fi_war>0
+            war=A/sqrt(fi_war);
+        end
+        if war>=1
+            stability(j)=1;
+        else
+            stability(j)=2;
+        end
+    end
 end
 
 function wartosc=krzywa(r,A,Sv)

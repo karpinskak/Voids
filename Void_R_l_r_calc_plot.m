@@ -10,10 +10,10 @@ addpath(DIR)
 Const=Constants;
 fDIR=[DIR 'Functions/'];
 addpath(fDIR)
+load([DIR,'Stare_przydatne/Data/Simulation_vortex_parameters.mat'],'vortex_param')
 nazwar1='R1_void';
 nazwar2='R2_void';
 nazwar3='Rs_void';
-load([DIR,'Stare_przydatne/Data/Simulation_vortex_parameters.mat'])
 
 
 if isfile([DIR nazwar1, '.mat']) && isfile([DIR nazwar2, '.mat']) && isfile([DIR nazwar3, '.mat'])
@@ -60,55 +60,56 @@ box on
 tiledlayout(3,numel(teta))
 
 for j=1:numel(teta)
-h(j)=nexttile;
-hp(j)=pcolor(Delta*skala,AA,R_l{j});
-if sim_points==1
-hold on
-punkciki=find(vortex_param.teta==teta(j));
-scatter(vortex_param.delta(punkciki)*skala,vortex_param.A(punkciki),point_size,'k','filled')
-end
-if mod(j,3)==1
-ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
-end
-grid on
-title(['$\theta=\pi/$',num2str(floor(1/(teta(j)/pi)))],'FontSize',fsize+2,'interpreter','latex')
-hold off
-end
-
-for j=1:numel(teta)
-h(j+numel(teta))=nexttile;
-hp(j+numel(teta))=pcolor(Delta*skala,AA,R_r{j});
-if sim_points==1
-hold on
-punkciki=find(vortex_param.teta==teta(j));
-scatter(vortex_param.delta(punkciki)*skala,vortex_param.A(punkciki),point_size,'k','filled')
-end
-if mod(j,numel(teta))==1
-ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
-end
-grid on
-hold off
+    h(j)=nexttile;
+    hp(j)=pcolor(Delta*skala,AA,R_l{j});
+    if sim_points==1
+        hold on
+        punkciki=find(vortex_param.teta==teta(j));
+        scatter(vortex_param.delta(punkciki)*skala,vortex_param.A(punkciki),point_size,'k','filled')
+    end
+    
+    if mod(j,3)==1
+        ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+    end
+    grid on
+    title(['$\theta=\pi/$',num2str(floor(1/(teta(j)/pi)))],'FontSize',fsize+2,'interpreter','latex')
+    hold off
 end
 
 for j=1:numel(teta)
-d(j)=nexttile;
-interv=R_r{j}-R_l{j};
-interv(interv<=0)=NaN;
-deltaR{j}=interv;
-hp(j+2*numel(teta))=pcolor(Delta*skala,AA,interv);
-
-if sim_points==1
-hold on
-punkciki=find(vortex_param.teta==teta(j));
-scatter(vortex_param.delta(punkciki)*skala,vortex_param.A(punkciki),point_size,'k','filled')
+    h(j+numel(teta))=nexttile;
+    hp(j+numel(teta))=pcolor(Delta*skala,AA,R_r{j});
+    if sim_points==1
+        hold on
+        punkciki=find(vortex_param.teta==teta(j));
+        scatter(vortex_param.delta(punkciki)*skala,vortex_param.A(punkciki),point_size,'k','filled')
+    end
+    if mod(j,numel(teta))==1
+        ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+    end
+    grid on
+    hold off
 end
 
-if mod(j,numel(teta))==1
-ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
-end
-grid on
-xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
-hold off
+for j=1:numel(teta)
+    d(j)=nexttile;
+    interv=R_r{j}-R_l{j};
+    interv(interv<=0)=NaN;
+    deltaR{j}=interv;
+    hp(j+2*numel(teta))=pcolor(Delta*skala,AA,interv);
+    
+    if sim_points==1
+        hold on
+        punkciki=find(vortex_param.teta==teta(j));
+        scatter(vortex_param.delta(punkciki)*skala,vortex_param.A(punkciki),point_size,'k','filled')
+    end
+    
+    if mod(j,numel(teta))==1
+        ylabel('$A$','FontSize',fsize+2,'interpreter','latex')
+    end
+    grid on
+    xlabel('$\delta$~$[cm]$','FontSize',fsize+2,'interpreter','latex')
+    hold off
 end
 
 %% Format plots
@@ -122,10 +123,10 @@ set(d,'yscale','log')
 set(d,'xscale','log')
 box on
 for j=1:numel(h)
-shading(h(j),'interp')
+    shading(h(j),'interp')
 end
 for j=1:numel(d)
-shading(d(j),'interp')
+    shading(d(j),'interp')
 end
 
 set(h(1:numel(teta)),'colormap',winter,'clim',[0 max(max(R_l{1}))])
